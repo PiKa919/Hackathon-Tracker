@@ -5,7 +5,8 @@ import { motion } from "framer-motion"
 import { Users, Trophy, ArrowRight, ExternalLink } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import Newsletter from "@/components/Newsletter";
+import CalendarFilters from "@/components/CalendarFilters";
+import ScrollProgress from "@/components/ScrollProgress";
 import Navigation from "@/components/Navigation";
 import FeaturedHackathons from "@/components/FeaturedHackathons";
 import { HeroSection } from "@/components/HeroSection"
@@ -97,8 +98,7 @@ const hackathons = [
   },
 ]
 
-function HackathonCalendar() {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 7, 1))
+function HackathonCalendar({ currentDate, setCurrentDate }) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   const today = new Date()
@@ -302,13 +302,18 @@ function HackathonCalendar() {
 }
 
 export default function HackathonTracker() {
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 7, 1));
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navigation />
-      <HeroSection />
+      <ScrollProgress />
+      <div id="home">
+        <HeroSection />
+      </div>
 
       {/* Calendar Section */}
-      <section className="py-20 px-6 relative">
+      <section id="calendar" className="py-20 px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-b from-background to-muted/20"></div>
         <div className="relative z-10">
           <ScrollAnimation animation="fade-in-up">
@@ -322,19 +327,23 @@ export default function HackathonTracker() {
             </div>
           </ScrollAnimation>
           
+          <CalendarFilters currentDate={currentDate} setCurrentDate={setCurrentDate} />
+
           <ScrollAnimation animation="scale-in" delay={300}>
             <div className="w-full max-w-6xl mx-auto">
-                <HackathonCalendar />
+                <HackathonCalendar currentDate={currentDate} setCurrentDate={setCurrentDate} />
             </div>
           </ScrollAnimation>
         </div>
       </section>
 
-      <FeaturesSection />
+      <div id="features">
+        <FeaturesSection />
+      </div>
       
-      <FeaturedHackathons />
-
-      <Newsletter />
+      <div id="featured-hackathons">
+        <FeaturedHackathons />
+      </div>
 
       <Footer />
     </div>

@@ -8,15 +8,34 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { useEffect, useState } from "react"
 
 const navItems = [
-  { icon: Home, tooltip: "Home", href: "#" },
-  { icon: Calendar, tooltip: "Calendar", href: "#" },
-  { icon: Info, tooltip: "About", href: "#" },
-  { icon: Mail, tooltip: "Contact", href: "#" },
+  { icon: Home, tooltip: "Home", href: "#home", id: "home" },
+  { icon: Calendar, tooltip: "Calendar", href: "#calendar", id: "calendar" },
+  { icon: Info, tooltip: "Features", href: "#features", id: "features" },
+  { icon: Mail, tooltip: "Newsletter", href: "#newsletter", id: "newsletter" },
 ]
 
 const Navigation = () => {
+  const [activeSection, setActiveSection] = useState("home")
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight / 2
+      for (let i = navItems.length - 1; i >= 0; i--) {
+        const section = document.getElementById(navItems[i].id)
+        if (section && section.offsetTop <= scrollPosition) {
+          setActiveSection(navItems[i].id)
+          break
+        }
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
   return (
     <TooltipProvider>
       <motion.div
@@ -31,9 +50,17 @@ const Navigation = () => {
               <TooltipTrigger asChild>
                 <a
                   href={item.href}
-                  className="p-3 hover:bg-gray-800 rounded-full transition-colors"
+                  className="p-3 rounded-full transition-colors"
+                  style={{
+                    backgroundColor: activeSection === item.id ? "var(--primary)" : "transparent",
+                  }}
                 >
-                  <item.icon className="w-6 h-6 text-gray-400" />
+                  <item.icon
+                    className="w-6 h-6 transition-colors"
+                    style={{
+                      color: activeSection === item.id ? "white" : "var(--muted-foreground)",
+                    }}
+                  />
                 </a>
               </TooltipTrigger>
               <TooltipContent side="left">
