@@ -3,8 +3,9 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { Users, Trophy, ArrowRight, ExternalLink } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import FeaturedHackathons from "@/components/FeaturedHackathons";
 import { HeroSection } from "@/components/HeroSection"
 import { FeaturesSection } from "@/components/FeaturesSection"
 import { Footer } from "@/components/Footer"
@@ -72,12 +73,31 @@ const hackathons = [
     prize: "$25,000",
     participants: "200+",
   },
+  {
+    id: 7,
+    name: "Gemini Hackathon",
+    description: "A hackathon to build amazing things with Gemini.",
+    registrationDate: new Date(2025, 7, 6), // August 6, 2025
+    color: "bg-pink-500",
+    url: "#",
+    prize: "$100,000",
+    participants: "1000+",
+  },
+  {
+    id: 8,
+    name: "Data Science Challenge",
+    description: "A challenge for data scientists.",
+    registrationDate: new Date(2025, 7, 6), // August 6, 2025
+    color: "bg-blue-500",
+    url: "#",
+    prize: "$50,000",
+    participants: "500+",
+  },
 ]
 
 function HackathonCalendar() {
-  const [currentDate, setCurrentDate] = useState(new Date())
-  const [hoveredDate, setHoveredDate] = useState<Date | null>(null)
-  const [hoveredHackathons, setHoveredHackathons] = useState<typeof hackathons>([])
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 7, 1))
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
 
   const today = new Date()
   const year = currentDate.getFullYear()
@@ -122,14 +142,11 @@ function HackathonCalendar() {
     return hackathons.filter((hackathon) => hackathon.registrationDate.toDateString() === date.toDateString())
   }
 
-  const handleDateHover = (day: number | null) => {
+  const handleDateClick = (day: number | null) => {
     if (!day) return
 
     const date = new Date(year, month, day)
-    const dayHackathons = getHackathonsForDate(day)
-
-    setHoveredDate(date)
-    setHoveredHackathons(dayHackathons)
+    setSelectedDate(date)
   }
 
   const isToday = (day: number) => {
@@ -149,9 +166,11 @@ function HackathonCalendar() {
     })
   }
 
+  const selectedHackathons = selectedDate ? getHackathonsForDate(selectedDate.getDate()) : []
+
   return (
-    <div className="relative">
-      <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800 rounded-2xl p-8">
+    <div className="relative flex gap-8">
+      <div className="bg-gray-900/50 backdrop-blur-xl border border-gray-800 rounded-2xl p-8 w-full">
         {/* Calendar Header */}
         <div className="flex items-center justify-between mb-8">
           <button onClick={() => navigateMonth("prev")} className="p-2 hover:bg-gray-800 rounded-lg transition-colors">
@@ -192,18 +211,16 @@ function HackathonCalendar() {
                 className={`
                   relative h-16 flex items-center justify-center rounded-lg cursor-pointer transition-all duration-200
                   ${
-                    isToday(day)
+                    selectedDate?.getDate() === day && selectedDate.getMonth() === month && selectedDate.getFullYear() === year
                       ? "bg-gradient-to-r from-purple-500 to-blue-500 text-white font-bold"
-                      : hasHackathons
-                        ? "bg-gray-800 hover:bg-gray-700 border border-gray-700"
-                        : "hover:bg-gray-800/50"
+                      : isToday(day)
+                        ? "bg-gray-700"
+                        : hasHackathons
+                          ? "bg-gray-800 hover:bg-gray-700 border border-gray-700"
+                          : "hover:bg-gray-800/50"
                   }
                 `}
-                onMouseEnter={() => handleDateHover(day)}
-                onMouseLeave={() => {
-                  setHoveredDate(null)
-                  setHoveredHackathons([])
-                }}
+                onClick={() => handleDateClick(day)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -224,48 +241,58 @@ function HackathonCalendar() {
         </div>
       </div>
 
-      {/* Hover Tooltip */}
-      {hoveredDate && hoveredHackathons.length > 0 && (
+      {/* Details Card */}
+      {selectedDate && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          className="absolute top-full left-1/2 transform -translate-x-1/2 mt-4 z-50"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 20 }}
+          className="w-1/3"
         >
-          <div className="bg-gray-900/95 backdrop-blur-xl border border-gray-800 rounded-xl p-6 min-w-80 max-w-md">
-            <h3 className="text-lg font-semibold text-white mb-4">Hackathons on {hoveredDate.toLocaleDateString()}</h3>
-            <div className="space-y-3">
-              {hoveredHackathons.map((hackathon) => (
-                <motion.div
-                  key={hackathon.id}
-                  className="group cursor-pointer"
-                  whileHover={{ x: 4 }}
-                  onClick={() => window.open(hackathon.url, "_blank")}
-                >
-                  <div className="flex items-start space-x-3">
-                    <div className={`w-3 h-3 rounded-full ${hackathon.color} mt-2 flex-shrink-0`} />
-                    <div className="flex-1">
-                      <h4 className="font-medium text-white group-hover:text-purple-400 transition-colors flex items-center">
-                        {hackathon.name}
-                        <ExternalLink className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </h4>
-                      <p className="text-sm text-gray-400 mt-1">{hackathon.description}</p>
-                      <div className="flex items-center space-x-4 mt-2">
-                        <span className="text-xs text-green-400 flex items-center">
-                          <Trophy className="w-3 h-3 mr-1" />
-                          {hackathon.prize}
-                        </span>
-                        <span className="text-xs text-blue-400 flex items-center">
-                          <Users className="w-3 h-3 mr-1" />
-                          {hackathon.participants}
-                        </span>
+          <Card className="bg-gray-900/50 backdrop-blur-xl border border-gray-800 rounded-2xl">
+            <CardHeader>
+              <CardTitle className="text-white">
+                Hackathons on {selectedDate.toLocaleDateString()}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {selectedHackathons.length > 0 ? (
+                <div className="space-y-4">
+                  {selectedHackathons.map((hackathon) => (
+                    <motion.div
+                      key={hackathon.id}
+                      className="group cursor-pointer"
+                      whileHover={{ x: 4 }}
+                      onClick={() => window.open(hackathon.url, "_blank")}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className={`w-3 h-3 rounded-full ${hackathon.color} mt-2 flex-shrink-0`} />
+                        <div className="flex-1">
+                          <h4 className="font-medium text-white group-hover:text-purple-400 transition-colors flex items-center">
+                            {hackathon.name}
+                            <ExternalLink className="w-3 h-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
+                          </h4>
+                          <p className="text-sm text-gray-400 mt-1">{hackathon.description}</p>
+                          <div className="flex items-center space-x-4 mt-2">
+                            <span className="text-xs text-green-400 flex items-center">
+                              <Trophy className="w-3 h-3 mr-1" />
+                              {hackathon.prize}
+                            </span>
+                            <span className="text-xs text-blue-400 flex items-center">
+                              <Users className="w-3 h-3 mr-1" />
+                              {hackathon.participants}
+                            </span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
+                    </motion.div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400">No hackathons scheduled for this day.</p>
+              )}
+            </CardContent>
+          </Card>
         </motion.div>
       )}
     </div>
@@ -287,13 +314,13 @@ export default function HackathonTracker() {
                 Interactive Calendar
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Track registration dates, hover over dates to see multiple events, and never miss an opportunity to innovate.
+                Track registration dates, click on dates to see events, and never miss an opportunity to innovate.
               </p>
             </div>
           </ScrollAnimation>
           
           <ScrollAnimation animation="scale-in" delay={300}>
-            <div className="w-full max-w-4xl mx-auto">
+            <div className="w-full max-w-6xl mx-auto">
                 <HackathonCalendar />
             </div>
           </ScrollAnimation>
@@ -302,6 +329,8 @@ export default function HackathonTracker() {
 
       <FeaturesSection />
       
+      <FeaturedHackathons />
+
       <Footer />
     </div>
   )
