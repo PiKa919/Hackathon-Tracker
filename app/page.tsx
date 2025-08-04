@@ -5,6 +5,8 @@ import { motion } from "framer-motion"
 import { Users, Trophy, ArrowRight, ExternalLink } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import Newsletter from "@/components/Newsletter";
+import Navigation from "@/components/Navigation";
 import FeaturedHackathons from "@/components/FeaturedHackathons";
 import { HeroSection } from "@/components/HeroSection"
 import { FeaturesSection } from "@/components/FeaturesSection"
@@ -302,6 +304,7 @@ function HackathonCalendar() {
 export default function HackathonTracker() {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <Navigation />
       <HeroSection />
 
       {/* Calendar Section */}
@@ -330,6 +333,8 @@ export default function HackathonTracker() {
       <FeaturesSection />
       
       <FeaturedHackathons />
+
+      <Newsletter />
 
       <Footer />
     </div>
